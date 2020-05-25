@@ -1,0 +1,40 @@
+<body>
+<h4>Details</h4>
+Name: {{ customer.name }}<br>
+Email: {{customer.email}}<br>
+Event: {{customer.event.name}}<br>
+<hr>
+
+<h4>Your Event Pass</h4>
+<img src="/media/qrs/{{customer.event.id}}{{customer.email}}.png" height="200" width="200">
+<hr>
+
+<h4>Pass Balance</h4>
+<table border="1">
+    <td>Pass Type</td>
+    <td>Balance</td>
+    {% for name, balance in passes.items %}
+        <tr>
+            <td>{{ name }}</td>
+            <td>{{ balance }}</td>
+        </tr>
+    {% endfor %}
+</table>
+<hr>
+
+<h4>Transactions</h4>
+<table border="1">
+        <tr>
+            <th>pass.name</th>
+            <th>count</th>
+            <th>datetime</th>
+        </tr>
+    {% for transaction in transactions %}
+        <tr>
+            <td>{{transaction.event_pass.name}}</td>
+            <td>{{transaction.count}}</td>
+            <td>{{transaction.datetime}}</td>
+        </tr>
+    {% endfor %}
+</table>
+</body>

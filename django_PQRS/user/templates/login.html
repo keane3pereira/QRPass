@@ -1,0 +1,13 @@
+<form method="post">
+{% csrf_token %}
+{{form.as_p}}
+<input type="submit" value="login">
+</form>
+<hr>
+
+Customer:
+<form method="POST" action="/customer/">
+    {% csrf_token %}
+    <input type="email" name="email">
+    <input type="submit" value="Customer details">
+</form>

@@ -1,0 +1,78 @@
+<h3> Hello, {{user}}</h3>
+
+<h2>{{event_name}}</h2>
+
+<form action="/register/">
+    <input type="submit" value="Register Passes">
+</form>
+
+<hr>
+
+<a href="users/">View Event Users</a>
+
+<hr>
+
+{% if passes.count > 0 %}
+    <table border="1">
+        <tr>
+            <td>Pass name</td>
+            <td>Cost</td>
+        </tr>
+        {% for pass in passes %}
+            <tr>
+                <td>{{pass.name}}</td>
+                <td>{{pass.cost}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <i> You currently have no pass types </i>
+{% endif %}
+
+<h4>Add a new pass type to the event</h4>
+
+<form method="POST">
+    {% csrf_token %}
+    Name: <input type="text" name="name"><br>
+    Cost: <input type="number" name="cost"><br>
+    <input type="submit" value="Create Pass">
+</form>
+
+{% if pass_create_result != '' %}
+    Pass create result: {{pass_create_result}}
+{% endif %}
+
+<hr>
+
+Transactions:
+<br>
+<table border="1">
+    <tr>
+        <td>Customer</td>
+        <td>Event</td>
+        <td>Pass</td>
+        <td>Count</td>
+        <td>Datetime</td>
+    </tr>
+    {% for transaction in transactions %}
+        <tr>
+            <td>{{transaction.customer.name}}</td>
+            <td>{{transaction.customer.event.name}}</td>
+            <td>{{transaction.PASS.name}}</td>
+            <td>{{transaction.count}}</td>
+            <td>{{transaction.datetime}}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+<hr>
+
+<a href="/events">Back</a>
+
+<hr>
+
+<form action="/events/passes/delete_data/" method="POST">
+    {% csrf_token %}
+    <input type="number" name="event" value="{{event}}" hidden>
+    <input type="submit" value="Delete All">
+</form>

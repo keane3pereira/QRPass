@@ -1,0 +1,23 @@
+<h3> Your Events </h3>
+
+<div>
+    {% if userevents.count > 0 %}
+        {% for userevent in userevents %}
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="event" value="{{userevent.event.name}}">
+            <input type="submit" value="{{userevent.event.name}}">
+        </form>
+        {% endfor %}
+    {% else %}
+        <i>You currently have no events.</i>
+    {% endif %}
+</div>
+
+<br>
+
+<a href="/create_event/">Create a new Event</a>
+
+<hr>
+
+<a href="/logout/">Sign out</a>

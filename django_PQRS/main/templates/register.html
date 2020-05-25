@@ -1,0 +1,33 @@
+
+<h4>Register a Pass for {{event_name}} </h4>
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Create Pass">
+</form>
+{% if message != '' %}
+    Result: {{message}}
+{% endif %}
+
+Transactions:
+<br>
+<table border="1">
+    <tr>
+        <td>Customer</td>
+        <td>Event</td>
+        <td>Pass</td>
+        <td>Count</td>
+        <td>Datetime</td>
+    </tr>
+    {% for transaction in transactions %}
+        <tr>
+            <td>{{transaction.customer.name}}</td>
+            <td>{{transaction.customer.event.name}}</td>
+            <td>{{transaction.PASS.name}}</td>
+            <td>{{transaction.count}}</td>
+            <td>{{transaction.datetime}}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+<a href="/home/"> Home </a>

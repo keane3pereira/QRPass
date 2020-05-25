@@ -1,0 +1,8 @@
+<h4>Create a New Event</h4>
+<form method="POST">
+    {% csrf_token %}
+    Event Name: <input type="text" name="name">
+    <input type="submit" value="Create Event">
+</form>
+
+<a href="/home/">Back to Home</a>
