@@ -29,4 +29,5 @@ class Transaction(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     PASS = models.ForeignKey(Pass, on_delete=models.CASCADE)
     count = models.IntegerField()
+    created_by = models.ForeignKey(CustomUser, on_delete = models.CASCADE)
     datetime = models.DateTimeField(default = timezone.now)

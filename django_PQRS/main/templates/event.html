@@ -52,6 +52,7 @@ Transactions:
         <td>Event</td>
         <td>Pass</td>
         <td>Count</td>
+        <td>Registered By</td>
         <td>Datetime</td>
     </tr>
     {% for transaction in transactions %}
@@ -60,7 +61,15 @@ Transactions:
             <td>{{transaction.customer.event.name}}</td>
             <td>{{transaction.PASS.name}}</td>
             <td>{{transaction.count}}</td>
+            <td>{{transaction.created_by.email}}</td>
             <td>{{transaction.datetime}}</td>
+            <td>
+                <form method="POST" action="undo_register/">
+                    {% csrf_token %}
+                    <input type="hidden" name="t_id" value="{{transaction.id}}">
+                    <input type="submit" value="Undo">
+                </form>
+            </td>
         </tr>
     {% endfor %}
 </table>
@@ -71,8 +80,14 @@ Transactions:
 
 <hr>
 
-<form action="/events/passes/delete_data/" method="POST">
+Delete Event: <br>
+<form action="delete_data/" method="POST">
     {% csrf_token %}
-    <input type="number" name="event" value="{{event}}" hidden>
+    Type the event name: <input type="text" name="event2" value=""><br>
+    <input type="hidden" name="event" value="{{event_name}}">
     <input type="submit" value="Delete All">
 </form>
+
+<hr>
+
+<a href="/logout/">Sign out</a>

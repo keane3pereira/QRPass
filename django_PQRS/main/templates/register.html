@@ -8,8 +8,8 @@
 {% if message != '' %}
     Result: {{message}}
 {% endif %}
-
-Transactions:
+<br>
+Your Transactions:
 <br>
 <table border="1">
     <tr>
@@ -29,5 +29,7 @@ Transactions:
         </tr>
     {% endfor %}
 </table>
-
+<hr>
 <a href="/home/"> Home </a>
+<hr>
+<a href="/logout/">Sign out</a>

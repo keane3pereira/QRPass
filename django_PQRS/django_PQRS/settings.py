@@ -132,3 +132,12 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 MEDIA_URL = '/media/'
+
+QR_FOLDER = BASE_DIR + "\\media\\qrs\\"
+
+
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 465  # For SSL
+EMAIL_HOST_USER = 'pythonformkeanesan@gmail.com'
+EMAIL_HOST_PASSWORD = 'password'
+EMAIL_USE_SSL = True

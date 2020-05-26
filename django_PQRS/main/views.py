@@ -3,6 +3,8 @@ from .models import Event, EventUser, Customer, Pass, Transaction
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from pyqrcode import create as qrcreate
+from .emails import send_register_mail, send_undo_register_mail
+from django.core.mail import send_mail
 from user.models import CustomUser
 from django.db.models import Sum
 from django.conf import settings
@@ -10,17 +12,17 @@ from os import listdir
 from PIL import Image
 import hashlib
 
-QR_FOLDER = settings.BASE_DIR + "\\media\\qrs\\"
-
-def create_qr_image(path, code):
-    try:
-        qr = qrcreate(code)
-        qr.png(path, scale = 4)
-        #print("saved")
-        return True
-    except Exception as e:
-        #print(e)
-        return False
+def get_qr_filepath(C):
+    file = str(C.event.id) + str(C.email) + ".png"
+    if file not in listdir(settings.QR_FOLDER):
+        print(listdir(settings.QR_FOLDER))
+        path = settings.QR_FOLDER + file
+        code = C.code
+        try:
+            qr = qrcreate(code)
+            qr.png(path, scale = 4)
+        except: pass
+    return settings.QR_FOLDER + file
 
 # Create your views here.
 
@@ -30,6 +32,7 @@ def home(request):
         if event_name != False:
             request.session[request.user.email] = event_name
             return redirect(event_details)
+    
     EU = EventUser.objects.filter(user = request.user)
     return render(request, 'home.html', {'userevents': EU})
 
@@ -43,58 +46,63 @@ def event_details(request):
         name = request.POST.get('name', False)
         if not Pass.objects.filter(event = E, name = name).exists():
             cost = request.POST.get('cost', False)
-            P = Pass(
+            Pass(
                 event = E,
                 name = name,
                 cost = cost
-            )
-            P.save()
+            ).save()
             pass_create_result = 'Success'
-        else:
+        else: 
             pass_create_result = 'Pass already exists'
-    T = Transaction.objects.filter(event = E)
+
+    T = Transaction.objects.filter(event = E).order_by('-datetime')[:10]
     P = Pass.objects.filter(event = E)
-    return render(request, 'event.html', {'event_name': E.name, 'passes': P, 'pass_create_result': pass_create_result, 'transactions': T})
+    return render(request, 'event.html',{
+        'pass_create_result': pass_create_result,
+        'event_name': E.name,
+        'transactions': T,
+        'passes': P
+    })
 
 def event_users(request):
     event_name = request.session[request.user.email]
     E = Event.objects.get(name = event_name)
     if request.method == 'POST':
         email = request.POST.get('users', False)
-        print(email)
         if email:
             user = CustomUser.objects.get(email = email)
             if not EventUser.objects.filter(user = user).exists():
-                EU = EventUser(
+                EventUser(
                     event = E,
                     user = user
-                )
-                EU.save()
+                ).save()
+
     EU = EventUser.objects.filter(event = E)
-    form = AddUserForm()
-    return render(request, 'event_users.html', {'event_users': EU, 'form': form})
+    return render(request, 'event_users.html', {
+        'event_users': EU,
+        'form': AddUserForm()
+    })
 
 @login_required(login_url='/login/')
 def create_event(request):
     if request.method == 'POST':
         event_name = request.POST.get('name', False)
-        print(event_name)
         if not Event.objects.filter(name = event_name).exists():
-            print('new event')
             E = Event(
                 name = event_name,
                 created_by = request.user
-                )
+            )
             E.save()
-            EU = EventUser(
+            EventUser(
                 event = E,
                 user = request.user
-            )
-            EU.save()
+            ).save()
+
             return redirect(home)
-        else:
-            print('event exists')
-    return render(request, 'create_event.html', {'form': PassCreationForm()})
+
+    return render(request, 'create_event.html', {
+        'form': PassCreationForm()
+    })
 
 @login_required(login_url='/login/')
 def register(request):
@@ -110,7 +118,7 @@ def register(request):
             C = Customer.objects.get(event = PASS.event, email = email)
         else:                        
             name = request.POST.get('name', "")
-            code = hashlib.sha1((str(PASS.event.id)+email).encode("UTF-8")).hexdigest()
+            code = hashlib.sha1((str(PASS.event.id) + email).encode("UTF-8")).hexdigest()
             C = Customer(
                 event = PASS.event,
                 email = email,
@@ -118,25 +126,57 @@ def register(request):
                 code = code
             )
             C.save()
-        T = Transaction(
-                customer = C,
-                event = E,
-                PASS = PASS,
-                count = count
-            )
-        T.save()
+
+        Transaction(
+            customer = C,
+            event = E,
+            PASS = PASS,
+            count = count,
+            created_by = request.user
+        ).save()
+        print(settings.QR_FOLDER + get_qr_filepath(C))
+
+        file = get_qr_filepath(C)
+        ''' send email to customer '''
+        send_register_mail(C.email, file)
         message = 'Success'
-    T = Transaction.objects.all() 
-    ''' add a registeredby field to transactions'''
-    return render(request, 'register.html', {'form': RegistrationForm(event = E.id),'event_name': event_name, 'transactions': T,'message': message})
+
+    T = Transaction.objects.filter(event = E, created_by = request.user).order_by('-datetime')[:10]
+    return render(request, 'register.html', {
+        'form': RegistrationForm(event = E.id),
+        'event_name': event_name,
+        'message': message,
+        'transactions': T
+    })
+
+@login_required(login_url='/login/')
+def undo_register(request):
+    event_name = request.session[request.user.email]
+    E = Event.objects.get(name = event_name)
+    if request.method == 'POST':
+        t_id = request.POST.get('t_id', False)
+        T = Transaction.objects.get(id = int(t_id), event = E)
+        C = T.customer
+        dt = T.datetime
+        T.delete()
+
+        ''' send email to customer '''
+        send_undo_register_mail(C, dt)
+
+    return redirect(event_details)
 
 @login_required(login_url='/login/')
 def delete_data(request):
-    e = request.POST.get('event', False)
-    if e:
-        T = Transaction.objects.filter(event = e)
-        C = Customer.objects.filter(event = e)
-        T.delete(); C.delete()
+    test_name = request.POST.get('event2', False)
+    event_name = request.session[request.user.email]
+    if test_name == event_name:
+        E = Event.objects.get(name = event_name)
+        T = Transaction.objects.filter(event = E)
+        C = Customer.objects.filter(event = E)
+        P = Pass.objects.filter(event = E)
+        EU = EventUser.objects.filter(event = E)
+        T.delete(); C.delete(); EU.delete(); E.delete()
+
     return redirect(home)
 
 def customer(request):
@@ -152,10 +192,9 @@ def customer(request):
                     t = T.filter(event_pass = P)
                     total = t.aggregate(Sum('count'))
                     BALANCE[P.name] = total['count__sum']
-                #print(BALANCE)
                 file = str(C.event.id) + str(C.email) + ".png"
-                if file not in listdir(QR_FOLDER):
-                    create_qr_image(QR_FOLDER + file, C.code)
+                if file not in listdir(settings.QR_FOLDER):
+                    pass
                 return render(request, 'customer.html',
-                    {'customer': C, 'transactions': T, 'passes': BALANCE})
+                    {'customer': C, 'passes': BALANCE})
     return redirect(create_event)
