@@ -1,6 +1,33 @@
-  <h2>Sign up</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Sign up</button>
-  </form>
+{% extends 'base.html' %}
+
+{% block head %}
+	{{ block.super }}
+{% endblock %}
+
+{% block body %}
+	{{ block.super }}
+	<div class="container-fluid">
+      	<div class="row align-items-center">
+        	<div class="col-md-8 col-lg-12">
+          		<div class="login d-flex  py-5">
+            		<div class="container">
+              			<div class="row">
+                			<div class="col-md-9 col-lg-5 mx-auto jumbotron bg-light">
+                  				<h3 class="login-heading mb-4">Sign up</h3>
+	              				<div class="">
+	                  				<form method="POST">
+					                  	{% csrf_token %}
+					                  	{{form.as_p}}
+					                    <br>
+					                    <button class="btn btn-lg btn-block bg-teal text-light text-uppercase" type="submit">Create Account</button>
+					                </form>
+	               				</div>
+                			</div>
+              			</div>
+            		</div>
+          		</div>
+        	</div>
+      	</div>
+    </div>
+
+{% endblock %}

@@ -1,32 +1,39 @@
-<h3> Hello, {{user}}</h3>
+{% extends 'base.html '%}
 
-<h2>{{event_name}} Users</h2>
+{% block body %}
+    <div class="container">
+        <div class="jumbotron bg-light">
+            <h3 class="h3">Hello
+                {% if user.name != "" %}
+                    {{user}}
+                {% else %}
+                    User
+                {% endif %}!
+            </h3>
 
-<form method="POST">
-    {% csrf_token %}
-    {{form.as_p}}
-    <input type="submit" value="Add user">
-</form>
+            <div class="py-4">
+                <h4 class="h4">{{event_name}} Users</h4>
+                <table class="table table-dark" border="1">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>
+                    {% for eventuser in event_users %}
+                        <tr>
+                            <td>{{eventuser.user.name}}</td>
+                            <td>{{eventuser.user.email}}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
 
-<br>
-
-<table border="1">
-    <tr>
-        <td>Name</td>
-        <td>Email</td>
-    </tr>
-    {% for eventuser in event_users %}
-        <tr>
-            <td>{{eventuser.user.name}}</td>
-            <td>{{eventuser.user.email}}</td>
-        </tr>
-    {% endfor %}
-</table>
-
-<hr>
-
-<a href="/event/">Back to Event</a>
-
-<hr>
-
-<a href="/logout/">Sign out</a>
+            <form method="POST">
+                {% csrf_token %}
+                {{form.as_p}}
+                <input type="submit" value="Add user">
+            </form>
+        </div>
+    </div>
+{% endblock %}

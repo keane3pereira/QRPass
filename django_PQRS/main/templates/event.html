@@ -1,93 +1,105 @@
-<h3> Hello, {{user}}</h3>
+{% extends 'base.html' %}
 
-<h2>{{event_name}}</h2>
-
-<form action="/register/">
-    <input type="submit" value="Register Passes">
-</form>
-
-<hr>
-
-<a href="users/">View Event Users</a>
-
-<hr>
-
-{% if passes.count > 0 %}
-    <table border="1">
-        <tr>
-            <td>Pass name</td>
-            <td>Cost</td>
-        </tr>
-        {% for pass in passes %}
-            <tr>
-                <td>{{pass.name}}</td>
-                <td>{{pass.cost}}</td>
-            </tr>
-        {% endfor %}
-    </table>
-{% else %}
-    <i> You currently have no pass types </i>
-{% endif %}
-
-<h4>Add a new pass type to the event</h4>
-
-<form method="POST">
-    {% csrf_token %}
-    Name: <input type="text" name="name"><br>
-    Cost: <input type="number" name="cost"><br>
-    <input type="submit" value="Create Pass">
-</form>
-
-{% if pass_create_result != '' %}
-    Pass create result: {{pass_create_result}}
-{% endif %}
-
-<hr>
-
-Transactions:
-<br>
-<table border="1">
-    <tr>
-        <td>Customer</td>
-        <td>Event</td>
-        <td>Pass</td>
-        <td>Count</td>
-        <td>Registered By</td>
-        <td>Datetime</td>
-    </tr>
-    {% for transaction in transactions %}
-        <tr>
-            <td>{{transaction.customer.name}}</td>
-            <td>{{transaction.customer.event.name}}</td>
-            <td>{{transaction.PASS.name}}</td>
-            <td>{{transaction.count}}</td>
-            <td>{{transaction.created_by.email}}</td>
-            <td>{{transaction.datetime}}</td>
-            <td>
-                <form method="POST" action="undo_register/">
+{% block body %}
+    {{block.super}}
+    <div class="container">
+        <div class="jumbotron bg-light">
+            <h3 class="">Hello
+                {% if user.name != "" %}
+                    {{user}}
+                {% else %}
+                    User
+                {% endif %}!
+            </h3>
+        <h3 class="h3 py-4">{{event_name}}</h3>
+        <a class="btn btn-outline-dark btn-block btn-lg" href="/register/">Register Passes</a>
+        <hr>
+        {% if passes.count > 0 %}
+            <table class="table table-dark" border="1">
+                <thead>
+                    <tr>
+                        <th>Pass name</th>
+                        <th>Cost</th>
+                    </tr>
+                </thead>
+                {% for pass in passes %}
+                    <tr>
+                        <td>{{pass.name}}</td>
+                        <td>{{pass.cost}}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <i> You currently have no pass types </i>
+        {% endif %}
+        <div class="d-flex py-5">
+            <div class="container">
+                    <div class="col-md-9 mx-auto">
+                        <h4 class="login-heading text-center ">Add a new pass type to the event</h4>
+                            <form method="POST" class="form login-form">
+                                {% csrf_token %}
+                                 <form class="form-control" method="POST">
+                                    {% csrf_token %}
+                                    Name: <input class="form-control" type="text" name="name"><br>
+                                    Cost: <input class="form-control" type="number" name="cost"><br>
+                                    <input class="btn btn-lg btn-block btn-outline-dark bg-teal text-light text-capitalize" type="submit" value="Create Pass">
+                                </form>
+                            </form>
+                        </div>
+                </div>
+            </div>
+        </div>
+        {% if pass_create_result != '' %}
+            Pass create result: {{pass_create_result}}
+        {% endif %}
+        <a class="btn btn-outline-secondary" href="users/">View Event Users</a>
+        <hr>
+        <h4 class="h4">
+            Transactions(latest):
+        </h4>
+        <table class="table table-dark" border="1">
+            <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th>Event</th>
+                    <th>Pass</th>
+                    <th>Count</th>
+                    <th>Registered By</th>
+                    <th>Datetime</th>
+                </tr>
+            </thead>
+            {% for transaction in transactions %}
+                <tr>
+                    <td>{{transaction.customer.name}}</td>
+                    <td>{{transaction.customer.event.name}}</td>
+                    <td>{{transaction.PASS.name}}</td>
+                    <td>{{transaction.count}}</td>
+                    <td>{{transaction.created_by.email}}</td>
+                    <td>{{transaction.datetime}}</td>
+                    <td>
+                        <form class="form" method="POST" action="undo_register/">
+                            {% csrf_token %}
+                            <input type="hidden" name="t_id" value="{{transaction.id}}">
+                            <input class="btn btn-outline-secondary text-light" type="submit" value="Undo">
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        
+        <div class="py-5 d-flex">
+            <div class="container">
+                <div class="mx-auto">
+                <h4 class="h4">Delete Event:</h4>
+                <form class="form" action="delete_data/" method="POST">
                     {% csrf_token %}
-                    <input type="hidden" name="t_id" value="{{transaction.id}}">
-                    <input type="submit" value="Undo">
+                    <span class="h6">Type the event name: </span>
+                    <input class="form-control" type="text" name="event2" required><br>
+                    <input class="form-control" type="hidden" name="event" value="{{event_name}}">
+                    <input class="btn btn-lg btn-danger text-capitalize" type="submit" value="Delete Event">
                 </form>
-            </td>
-        </tr>
-    {% endfor %}
-</table>
-
-<hr>
-
-<a href="/events">Back</a>
-
-<hr>
-
-Delete Event: <br>
-<form action="delete_data/" method="POST">
-    {% csrf_token %}
-    Type the event name: <input type="text" name="event2" value=""><br>
-    <input type="hidden" name="event" value="{{event_name}}">
-    <input type="submit" value="Delete All">
-</form>
-
-<hr>
-
-<a href="/logout/">Sign out</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

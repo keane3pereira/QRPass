@@ -1,9 +1,9 @@
 from .forms import PassCreationForm, RegistrationForm, AddUserForm
 from .models import Event, EventUser, Customer, Pass, Transaction
+from .emails import send_register_mail, send_undo_register_mail
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from pyqrcode import create as qrcreate
-from .emails import send_register_mail, send_undo_register_mail
 from django.core.mail import send_mail
 from user.models import CustomUser
 from django.db.models import Sum
@@ -80,6 +80,7 @@ def event_users(request):
     EU = EventUser.objects.filter(event = E)
     return render(request, 'event_users.html', {
         'event_users': EU,
+        'event_name': E.name,
         'form': AddUserForm()
     })
 
@@ -141,7 +142,7 @@ def register(request):
         send_register_mail(C.email, file)
         message = 'Success'
 
-    T = Transaction.objects.filter(event = E, created_by = request.user).order_by('-datetime')[:10]
+    T = Transaction.objects.filter(event = E, created_by = request.user).order_by('-datetime')[:5]
     return render(request, 'register.html', {
         'form': RegistrationForm(event = E.id),
         'event_name': event_name,

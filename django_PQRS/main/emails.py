@@ -8,10 +8,18 @@ import main.views as main_views
 from os import listdir
 from PIL import Image
 
+
 from_email = 'pythonformkeanesan@gmail.com'
 
+def send_register_mail(to, file):
+    C = Customer.objects.get(email = to)
+    T = Transaction.objects.filter(customer = C)
+    PASS = Pass.objects.filter(event = C.event)
+    with open(file, 'rb') as f:
+        data = f.read()
+    img = MIMEImage(data, name=file)
+    msg = EmailMultiAlternatives('Your pass has been registered!', 'Your pass has been registered!', from_email, [to])
 
-def create_register_message(C, PASS, T):
     if C.name == '': name = 'there'
     else: name = C.name
     message = f'''
@@ -32,22 +40,16 @@ Current Balance:<br>
 Your QR-Pass for the event is included along with this email.
 Please do not share your code with others.
 '''
-    #print(message)
-    return message
-
-def send_register_mail(to, file):
-    C = Customer.objects.get(email = to)
-    T = Transaction.objects.filter(customer = C)
-    PASS = Pass.objects.filter(event = C.event)
-    with open(file, 'rb') as f:
-        data = f.read()
-    img = MIMEImage(data, name=file)
-    msg = EmailMultiAlternatives('Your pass has been registered!', 'Your pass has been registered!', from_email, [to])
-    msg.attach_alternative(create_register_message(C, PASS, T), 'text/html')
+    msg.attach_alternative(message, 'text/html')
     msg.attach(img)
     msg.send()
 
-def create_undo_register_message(C, PASS, T, datetime):
+
+def send_undo_register_mail(C, datetime):
+    to = C.email
+    T = Transaction.objects.filter(customer = C)
+    PASS = Pass.objects.filter(event = C.event)
+
     if C.name == '': name = 'there'
     else: name = C.name
     message = f'''
@@ -68,16 +70,7 @@ Current Balance:<br>
 Your QR-Pass for the event is included along with this email.
 Please do not share your code with others.
 '''
-    #print(message)
-    return message
-
-def send_undo_register_mail(C, datetime):
-    to = C.email
-    T = Transaction.objects.filter(customer = C)
-    PASS = Pass.objects.filter(event = C.event)
-
-    message = create_undo_register_message(C, PASS, T, datetime)
 
     msg = EmailMultiAlternatives('Registration Cancelled!', message, from_email, [to])
-    msg.attach_alternative(create_register_message(C, PASS, T), 'text/html')
+    msg.attach_alternative(message, 'text/html')
     msg.send()

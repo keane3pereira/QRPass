@@ -32,6 +32,8 @@ def sign_in(request):
     return render(request, 'login.html', {'form': form})
 
 def sign_out(request):
+    try: del request.session[request.user.email]
+    except KeyError: pass
     logout(request)
     return redirect(sign_in)
 

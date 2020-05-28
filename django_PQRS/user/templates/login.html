@@ -1,13 +1,42 @@
-<form method="post">
-{% csrf_token %}
-{{form.as_p}}
-<input type="submit" value="login">
-</form>
-<hr>
+{% extends 'base.html' %}
 
-Customer:
-<form method="POST" action="/customer/">
-    {% csrf_token %}
-    <input type="email" name="email">
-    <input type="submit" value="Customer details">
-</form>
+{% block body %}
+    {{ block.super }}
+    <div class="container-fluid">
+      	<div class="row align-items-center">
+        	<div class="col-md-8 col-lg-12">
+          		<div class="login d-flex  py-5">
+            		<div class="container ">
+              			<div class="row">
+                			<div class="col-md-9 col-lg-4 mx-auto jumbotron bg-light">
+                  				<h3 class="login-heading text-center mb-4">Welcome back!</h3>
+	                  				<form method="POST" class="form login-form">
+					                  	{% csrf_token %}
+					                  	{{form.as_p}}
+					                    <button class="btn btn-lg btn-block bg-teal text-light text-capitalize" type="submit">Sign in</button>
+					                    <div class="text-center">
+					                      <a class="small" href="#">Forgot password?</a></div>
+					                </form>
+					                <center>Don't have an account?</center>
+					                <div>
+					                	<a class="btn btn-lg btn-block bg-teal text-light text-capitalize" href="/sign_up/">Sign up</a>
+					                </div>
+	               				</div>
+                			</div>
+              			</div>
+            		</div>
+          		</div>
+        	</div>
+      	</div>
+    </div>
+    <div>
+    <div>
+        Customer:<form method="POST" action="/customer/">
+            {% csrf_token %}
+            <input type="email" name="email">
+            <input type="submit" value="Customer details">
+        </form>
+        </div>
+    </div>
+
+{% endblock %}
