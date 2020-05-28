@@ -33,7 +33,7 @@ def sign_in(request):
 
 def sign_out(request):
     try: del request.session[request.user.email]
-    except KeyError: pass
+    except: pass
     logout(request)
     return redirect(sign_in)
 

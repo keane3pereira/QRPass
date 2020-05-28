@@ -11,14 +11,13 @@ from PIL import Image
 
 from_email = 'pythonformkeanesan@gmail.com'
 
-def send_register_mail(to, file):
-    C = Customer.objects.get(email = to)
+def send_register_mail(C, file):
     T = Transaction.objects.filter(customer = C)
     PASS = Pass.objects.filter(event = C.event)
     with open(file, 'rb') as f:
         data = f.read()
     img = MIMEImage(data, name=file)
-    msg = EmailMultiAlternatives('Your pass has been registered!', 'Your pass has been registered!', from_email, [to])
+    msg = EmailMultiAlternatives('Your pass has been registered!', 'Your pass has been registered!', from_email, [C.email])
 
     if C.name == '': name = 'there'
     else: name = C.name

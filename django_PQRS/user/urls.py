@@ -15,9 +15,9 @@ Including another URLconf
 """
 
 from django.contrib.auth import views as auth_views
+from django.urls import path, include
 from django.contrib import admin
 import user.views as user_views
-from django.urls import path, include
 
 urlpatterns = [
     path('login/', user_views.sign_in, name="sign_in"),

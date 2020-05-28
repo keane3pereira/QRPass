@@ -9,19 +9,23 @@
                 <h3 class="col-md-3 col-sm-6 mb-4"> Your Events </h3>
             </div>
             <div class="row">
-                {% if userevents.count > 0 %}
-                    {% for userevent in userevents %}
+                    {% if userevents.count > 0 %}
+                        {% for userevent in userevents %}
+                        
+                            <div class="col-md-3 col-sm-6 mb-4">
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="event" value="{{userevent.event.name}}">
+                                    <input type="submit" style="padding:20px; border-radius:10px;" class="btn btn-dark  btn-block text-uppercase" value="{{userevent.event.name}}">
+                                </form>
+                            </div>                            
+                        {% endfor %}
+                    {% else %}
                         <div class="col-md-3 col-sm-6 mb-4">
-                            <form method="POST">
-                                {% csrf_token %}
-                                <input type="hidden" name="event" value="{{userevent.event.name}}">
-                                <input type="submit" style="padding:20px; border-radius:10px;" class="btn btn-dark  btn-block text-uppercase" value="{{userevent.event.name}}">
-                            </form>
+                            <i class="h6 py-5">You currently have no events.</i>
                         </div>
-                    {% endfor %}
-                {% else %}
-                    <i class="small">You currently have no events.</i>
-                {% endif %}
+                    {% endif %}
+                
             </div>
             
         <a  class="btn bg-teal btn-lg text-light btn-block text-uppercase" href="/create_event/">Create a new Event</a>

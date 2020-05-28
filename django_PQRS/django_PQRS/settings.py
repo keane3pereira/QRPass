@@ -138,7 +138,7 @@ QR_FOLDER = BASE_DIR + "\\media\\qrs\\"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 465  # For SSL
 EMAIL_HOST_USER = 'pythonformkeanesan@gmail.com'
-EMAIL_HOST_PASSWORD = 'password'
+EMAIL_HOST_PASSWORD = 'KeaneSan123'
 EMAIL_USE_SSL = True
 
 STATIC_URL = '/static/'

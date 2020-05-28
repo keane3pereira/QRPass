@@ -11,6 +11,21 @@ from django.conf import settings
 from os import listdir
 from PIL import Image
 import hashlib
+import random
+
+L = list('abcdefghijklmnopqrstuvwxyz')
+N = list('1234567890')
+S = list('!@#$%^&*()')
+
+def generate_code():
+    while True:
+        x = random.sample(L, 4) + random.sample(N, 3) + random.sample(S,2)
+        random.shuffle(x)
+        m = ''
+        for i in x:
+            m += i
+        if not Customer.objects.filter(code = m).exists():
+            return m
 
 def get_qr_filepath(C):
     file = str(C.event.id) + str(C.email) + ".png"
@@ -119,7 +134,7 @@ def register(request):
             C = Customer.objects.get(event = PASS.event, email = email)
         else:                        
             name = request.POST.get('name', "")
-            code = hashlib.sha1((str(PASS.event.id) + email).encode("UTF-8")).hexdigest()
+            code = generate_code()
             C = Customer(
                 event = PASS.event,
                 email = email,
@@ -139,7 +154,7 @@ def register(request):
 
         file = get_qr_filepath(C)
         ''' send email to customer '''
-        send_register_mail(C.email, file)
+        send_register_mail(C, file)
         message = 'Success'
 
     T = Transaction.objects.filter(event = E, created_by = request.user).order_by('-datetime')[:5]

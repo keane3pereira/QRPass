@@ -1,11 +1,24 @@
-<h4>Create a New Event</h4>
-<form method="POST">
-    {% csrf_token %}
-    Event Name: <input type="text" name="name">
-    <input type="submit" value="Create Event">
-</form>
+{% extends 'base.html' %}
 
-<a href="/home/">Back to Home</a>
-
-<hr>
-<a href="/logout/">Sign out</a>
+{% block body %}
+    {{block.super}}
+    <div class="container">
+        <div  class="my-4 jumbotron bg-light">
+            <div class="mx-auto">
+                <div class="">
+                    <h4 class="h4"> Create a New Event </h4>
+                </div>
+                <div class="py-4">
+                    <form class="form" method="POST">
+                        {% csrf_token %}
+                        <span class="h6">Event Name:</span>
+                        <input class="form-control  mb-4" type="text" name="name">
+                        <div>
+                            <input type="submit" class="btn btn-dark btn-lg btn-block text-uppercase" value="Create Event">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
