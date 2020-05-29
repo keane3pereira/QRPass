@@ -28,7 +28,59 @@
                 
             </div>
             
-        <a  class="btn bg-teal btn-lg text-light btn-block text-uppercase" href="/create_event/">Create a new Event</a>
+        <a  class="btn bg-teal btn-lg text-light btn-block text-uppercase" id="create_btn">Create a new Event</a>
         </div>
+        <div id="create_modal" class="modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Create a New Event</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mx-auto">
+                            <div class="py-4">
+                                <form class="form" method="POST" action="/create_event/">
+                                    {% csrf_token %}
+                                    <span class="h6">Event Name:</span>
+                                    <input class="form-control  mb-4" type="text" name="name">
+                                    <input type="submit" class="btn btn-dark btn-lg btn-block text-uppercase" value="Create Event">
+                                </form>
+                            </div>
+                        </div>   
+                    </div>
+                </div>
+            </div>
+        </div>
+    <script>
+        // Get the modal
+        var modal = document.getElementById("create_modal");
+
+        // Get the button that opens the modal
+        var btn = document.getElementById("create_btn");
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks the button, open the modal 
+        btn.onclick = function() {
+        modal.style.display = "block";
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+        modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+        }
+    </script>
     </div>
+
 {% endblock %}

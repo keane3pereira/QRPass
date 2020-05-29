@@ -3,13 +3,13 @@ from .models import Event, EventUser, Customer, Pass, Transaction
 from .emails import send_register_mail, send_undo_register_mail
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from pyqrcode import create as qrcreate
 from django.core.mail import send_mail
 from user.models import CustomUser
 from django.db.models import Sum
 from django.conf import settings
 from os import listdir
 from PIL import Image
+import pyqrcode
 import hashlib
 import random
 
@@ -28,15 +28,14 @@ def generate_code():
             return m
 
 def get_qr_filepath(C):
-    file = str(C.event.id) + str(C.email) + ".png"
+    file = C.code + ".png"
     if file not in listdir(settings.QR_FOLDER):
         print(listdir(settings.QR_FOLDER))
         path = settings.QR_FOLDER + file
-        code = C.code
         try:
-            qr = qrcreate(code)
+            qr = pyqrcode.create(C.code)
             qr.png(path, scale = 4)
-        except: pass
+        except Exception as e: print(e)
     return settings.QR_FOLDER + file
 
 # Create your views here.
